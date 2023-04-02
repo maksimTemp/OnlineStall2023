@@ -34,7 +34,7 @@ namespace OrderAPI.Controllers
             return await _service.CreateAsync(req);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<Order> Update([FromBody] Order req)
         {
             return await _service.UpdateAsync(req);

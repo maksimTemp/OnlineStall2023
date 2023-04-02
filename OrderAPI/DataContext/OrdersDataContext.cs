@@ -6,6 +6,7 @@ namespace OrderAPI.DataContext
     public class OrdersDataContext : DbContext
     {
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         public OrdersDataContext(DbContextOptions options) : base(options) { }
 

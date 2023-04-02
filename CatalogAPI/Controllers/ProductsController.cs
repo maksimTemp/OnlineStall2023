@@ -35,13 +35,13 @@ namespace CatalogAPI.Controllers
             return await _service.CreateAsync(req);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<Product> Update([FromBody] Product req)
         {
             return await _service.UpdateAsync(req);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task UpdateRange([FromBody] IEnumerable<Product> req)
         {
             await _service.UpdateRangeAsync(req);

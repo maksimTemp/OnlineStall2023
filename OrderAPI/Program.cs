@@ -19,15 +19,8 @@ namespace OrderAPI
 
             builder.Services.AddTransient<IOrderService, OrdersService>();
 
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-
-            IMapper mapper = mapperConfig.CreateMapper();
-            builder.Services.AddSingleton(mapper);
-
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

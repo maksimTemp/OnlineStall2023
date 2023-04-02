@@ -19,16 +19,9 @@ namespace CatalogAPI
             builder.Services.AddTransient<IProductsService, ProductsService>();
             builder.Services.AddTransient<IProducerService, ProducersService>();
             builder.Services.AddTransient<ICategoryService, CategoriesService>();
-
+            
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-
-            IMapper mapper = mapperConfig.CreateMapper();
-            builder.Services.AddSingleton(mapper);
-
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

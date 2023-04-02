@@ -13,8 +13,8 @@ namespace CatalogAPI.DataContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>()
-                .HasOne(x => x.Category);
+            //modelBuilder.Entity<Product>()
+            //    .HasOne(x => x.Category);
 
             base.OnModelCreating(modelBuilder);
         }

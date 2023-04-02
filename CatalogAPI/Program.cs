@@ -14,6 +14,9 @@ namespace CatalogAPI
 
             builder.Services.AddDbContext<CatalogDataContext>(options => options.UseSqlServer(connectionString));
 
+            builder.Services.AddTransient<IProductsService, ProductsService>();
+            builder.Services.AddTransient<IProducerService, ProducersService>();
+            builder.Services.AddTransient<ICategoryService, CategoriesService>();
 
             builder.Services.AddControllers();
 

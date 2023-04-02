@@ -1,17 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CatalogAPI.DataContext;
 using CatalogAPI.Domain;
+using CatalogAPI.Models.Requests;
+using AutoMapper;
 
 namespace CatalogAPI.Services
 {
     public class ProductsService : IProductsService
     {
         private readonly CatalogDataContext _dbContext;
+        private readonly IMapper _mapper;
 
-
-        public ProductsService(CatalogDataContext dbContext)
+        public ProductsService(CatalogDataContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public async Task<Product> GetByIdAsync(Guid id)
@@ -24,10 +27,10 @@ namespace CatalogAPI.Services
             return await _dbContext.Products.ToListAsync();
         }
 
-        public async Task<Product> CreateAsync(Product product)
+        public async Task<Product> CreateAsync(ProductCreateRequest product)
         {
-
-            var res = await _dbContext.Products.AddAsync(product);
+            var toCreate = _mapper.Map<Product>(product);
+            var res = await _dbContext.Products.AddAsync(toCreate);
             await _dbContext.SaveChangesAsync();
             return res.Entity;
         }
@@ -56,7 +59,7 @@ namespace CatalogAPI.Services
 
     public interface IProductsService : IService<Product>
     {
-        Task<Product> CreateAsync(Product product);
+        Task<Product> CreateAsync(ProductCreateRequest product);
         Task UpdateRangeAsync(IEnumerable<Product> product);
     }
 }

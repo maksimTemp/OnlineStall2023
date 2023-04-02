@@ -1,6 +1,9 @@
 using CatalogAPI.DataContext;
+using CatalogAPI.Mapping;
 using CatalogAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using CatalogAPI.Mapping;
 
 namespace CatalogAPI
 {
@@ -19,6 +22,14 @@ namespace CatalogAPI
             builder.Services.AddTransient<ICategoryService, CategoriesService>();
 
             builder.Services.AddControllers();
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            builder.Services.AddSingleton(mapper);
+
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

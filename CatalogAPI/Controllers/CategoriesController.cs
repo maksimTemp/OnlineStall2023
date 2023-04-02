@@ -1,4 +1,5 @@
 ﻿using CatalogAPI.Domain;
+using CatalogAPI.Models.Requests;
 using CatalogAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,7 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<Category> Create([FromBody] Category req)
+        public async Task<Category> Create([FromBody] CategoryCreateRequest req)
         {
             return await _service.CreateAsync(req);
         }

@@ -1,5 +1,7 @@
-﻿using CatalogAPI.DataContext;
+﻿using AutoMapper;
+using CatalogAPI.DataContext;
 using CatalogAPI.Domain;
+using CatalogAPI.Models.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogAPI.Services
@@ -7,11 +9,12 @@ namespace CatalogAPI.Services
     public class ProducersService : IProducerService
     {
         private readonly CatalogDataContext _dbContext;
+        private readonly IMapper _mapper;
 
-
-        public ProducersService(CatalogDataContext dbContext)
+        public ProducersService(CatalogDataContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public async Task<Producer> GetByIdAsync(Guid id)
@@ -24,10 +27,10 @@ namespace CatalogAPI.Services
             return await _dbContext.Producers.ToListAsync();
         }
 
-        public async Task<Producer> CreateAsync(Producer producer)
+        public async Task<Producer> CreateAsync(ProducerCreateRequest producer)
         {
-
-            var res = await _dbContext.Producers.AddAsync(producer);
+            var toCreate = _mapper.Map<Producer>(producer);
+            var res = await _dbContext.Producers.AddAsync(toCreate);
             await _dbContext.SaveChangesAsync();
             return res.Entity;
         }
@@ -55,6 +58,6 @@ namespace CatalogAPI.Services
     }
     public interface IProducerService : IService<Producer>
     {
-        Task<Producer> CreateAsync(Producer producer);
+        Task<Producer> CreateAsync(ProducerCreateRequest producer);
     }
 }

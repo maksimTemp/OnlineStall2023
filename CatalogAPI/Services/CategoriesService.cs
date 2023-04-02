@@ -2,17 +2,20 @@
 using CatalogAPI.DataContext;
 using System.Data.Entity;
 using CatalogAPI.Domain;
+using AutoMapper;
+using CatalogAPI.Models.Requests;
 
 namespace CatalogAPI.Services
 {
     public class CategoriesService : ICategoryService
     {
         private readonly CatalogDataContext _dbContext;
+        private readonly IMapper _mapper;
 
-
-        public CategoriesService(CatalogDataContext dbContext)
+        public CategoriesService(CatalogDataContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public async Task<Category> GetByIdAsync(Guid id)
@@ -25,10 +28,10 @@ namespace CatalogAPI.Services
             return await _dbContext.Categories.ToListAsync();
         }
 
-        public async Task<Category> CreateAsync(Category category)
+        public async Task<Category> CreateAsync(CategoryCreateRequest category)
         {
-
-            var res = await _dbContext.Categories.AddAsync(category);
+            var toCreate = _mapper.Map<Category>(category);
+            var res = await _dbContext.Categories.AddAsync(toCreate);
             await _dbContext.SaveChangesAsync();
             return res.Entity;
         }
@@ -59,6 +62,6 @@ namespace CatalogAPI.Services
 
     public interface ICategoryService : IService<Category>
     {
-        Task<Category> CreateAsync(Category category);
+        Task<Category> CreateAsync(CategoryCreateRequest category);
     }
 }

@@ -1,10 +1,11 @@
-using CatalogAPI.DataContext;
-using CatalogAPI.Mapping;
-using CatalogAPI.Services;
+using OrderAPI.DataContext;
+using OrderAPI.Mapping;
+using OrderAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using OrderAPI.Domain;
 
-namespace CatalogAPI
+namespace OrderAPI
 {
     public class Program
     {
@@ -14,12 +15,10 @@ namespace CatalogAPI
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            builder.Services.AddDbContext<CatalogDataContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<OrdersDataContext>(options => options.UseSqlServer(connectionString));
 
-            builder.Services.AddTransient<IProductsService, ProductsService>();
-            builder.Services.AddTransient<IProducerService, ProducersService>();
-            builder.Services.AddTransient<ICategoryService, CategoriesService>();
-            
+            builder.Services.AddTransient<IOrderService, OrdersService>();
+
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
 

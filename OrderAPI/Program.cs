@@ -4,7 +4,6 @@ using OrderAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using OrderAPI.Domain;
-using CatalogAPI.Services;
 
 namespace OrderAPI
 {
@@ -16,11 +15,9 @@ namespace OrderAPI
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            builder.Services.AddDbContext<CatalogDataContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<OrdersDataContext>(options => options.UseSqlServer(connectionString));
 
-            builder.Services.AddTransient<IProductsService, ProductsService>();
             builder.Services.AddTransient<IOrderService, OrdersService>();
-            builder.Services.AddTransient<ICategoryService, CategoriesService>();
 
             builder.Services.AddControllers();
             var mapperConfig = new MapperConfiguration(mc =>

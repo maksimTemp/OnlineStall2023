@@ -3,12 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OrderAPI.DataContext
 {
-    public class CatalogDataContext : DbContext
+    public class OrdersDataContext : DbContext
     {
-        public DbSet<Order> Producers { get; set; }
-        public DbSet<OrderItem> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
-        public CatalogDataContext(DbContextOptions options) : base(options) { }
+        public OrdersDataContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

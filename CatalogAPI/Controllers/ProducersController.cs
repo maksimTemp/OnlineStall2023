@@ -1,7 +1,6 @@
 ﻿using CatalogAPI.Domain;
 using CatalogAPI.Models.Requests;
 using CatalogAPI.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CatalogAPI.Controllers

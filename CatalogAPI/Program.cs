@@ -3,7 +3,6 @@ using CatalogAPI.Mapping;
 using CatalogAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using CatalogAPI.Mapping;
 
 namespace CatalogAPI
 {

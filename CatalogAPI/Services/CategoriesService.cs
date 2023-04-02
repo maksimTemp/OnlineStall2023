@@ -43,13 +43,6 @@ namespace CatalogAPI.Services
             return await Task.FromResult(upd.Entity);
         }
 
-        public async Task UpdateRangeAsync(IEnumerable<Category> category)
-        {
-            _dbContext.Categories.UpdateRange(category);
-            await _dbContext.SaveChangesAsync();
-            return;
-        }
-
         public async Task<int> DeleteAsync(Guid id)
         {
             var toDelete = await _dbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);

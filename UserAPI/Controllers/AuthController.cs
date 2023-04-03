@@ -1,10 +1,6 @@
-﻿using AuthorizationApi.Contracts.Requests;
-using AuthorizationApi.Models.Requests;
-using AuthorizationApi.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using AuthorizationApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Security.Claims;
+using UserAPI.Models.Requests;
 
 namespace AuthorizationApi.Controllers
 {
@@ -49,12 +45,6 @@ namespace AuthorizationApi.Controllers
                 Ok(result) :
                 Unauthorized(result);
         }
-        
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetRole([FromHeader] string authorization)
-        {
-            return Ok(_authService.GetRole(authorization.Remove(0,7)));
-        }
+
     }
 }

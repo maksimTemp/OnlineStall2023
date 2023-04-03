@@ -1,14 +1,12 @@
-﻿using UserAPI.Context;
-using UserAPI.Contracts.Requests;
-using UserAPI.Contracts.Responses;
-using UserAPI.Domain;
-using UserAPI.Models.Requests;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using UserAPI.DataContext;
+using UserAPI.Domain;
+using UserAPI.Models.Requests;
+using UserAPI.Models.Responses;
+using UserAPI.Services;
 
 namespace AuthorizationApi.Services
 {
@@ -18,7 +16,6 @@ namespace AuthorizationApi.Services
         Task<AuthenticationResponse> LogInAsync(LoginRequest request);
         Task<AuthenticationResponse> RefreshAsync(RefreshTokenRequest request);
         Task<string> GetRole(string userToken);
-        Task ConsumeUserChangedMessage(ConsumeContext<UserDataChangedMessage> consumeContext);
     }
 
     public class AuthService : IAuthService
@@ -35,7 +32,7 @@ namespace AuthorizationApi.Services
         public async Task<RegistrationResponse> RegisterAsync(RegisterRequest request)
         {
             var pwHash = Encoding.UTF8.GetString(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
-            var userExists = await _userContext.Users.FirstOrDefaultAsync(x => (x.Email == request.Email) && (x.PWHash == pwHash));
+            var userExists = await _dbContext.Identities.FirstOrDefaultAsync(x => (x.Email == request.Email) && (x.PWHash == pwHash));
             if (userExists != null)
                 return new RegistrationResponse
                 {
@@ -44,17 +41,17 @@ namespace AuthorizationApi.Services
                 };
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            var newUser = new User()
+            var newUser = new Identity()
             {
                 Email = request.Email,
                 PWHash = pwHash,
                 RefreshToken = refreshToken,
                 RefreshTokenExpiryTime = DateTime.Now.AddDays(7),
-                Role = request?.Role ?? UserRolesEnum.User
+                Role = request?.Role ?? UserRolesEnum.Customer
             };
 
-            await _userContext.Users.AddAsync(newUser);
-            await _userContext.SaveChangesAsync();
+            await _dbContext.Identities.AddAsync(newUser);
+            await _dbContext.SaveChangesAsync();
 
             return new RegistrationResponse
             {
@@ -65,7 +62,7 @@ namespace AuthorizationApi.Services
         public async Task<AuthenticationResponse> LogInAsync(LoginRequest request)
         {
             var pwHash = Encoding.UTF8.GetString(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
-            var user = await _userContext.Users.FirstOrDefaultAsync(x => (x.Email == request.Email) );
+            var user = await _dbContext.Identities.FirstOrDefaultAsync(x => (x.Email == request.Email) );
 
             if (user is null)
                 return new AuthenticationResponse
@@ -84,7 +81,7 @@ namespace AuthorizationApi.Services
             var refreshToken = _tokenService.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
-            _userContext.SaveChangesAsync();
+            _dbContext.SaveChangesAsync();
             return new AuthenticationResponse
             {
                 Token = accessToken,
@@ -99,7 +96,7 @@ namespace AuthorizationApi.Services
             string refreshToken = request.RefreshToken;
             var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
             var email = principal.Identity.Name;
-            var user = await _userContext.Users.SingleOrDefaultAsync(x => x.Email == email);
+            var user = await _dbContext.Identities.SingleOrDefaultAsync(x => x.Email == email);
             if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
                 return new AuthenticationResponse()
                 {
@@ -109,7 +106,7 @@ namespace AuthorizationApi.Services
             var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
             user.RefreshToken = newRefreshToken;
-            await _userContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
             return new AuthenticationResponse()
             {
@@ -122,14 +119,6 @@ namespace AuthorizationApi.Services
         public async Task<string> GetRole(string userToken)
         {
             return _tokenService.GetRole(userToken);
-        }
-
-        public async Task ConsumeUserChangedMessage(ConsumeContext<UserDataChangedMessage> consumeContext)
-        {
-            var user = _userContext.Users.First(x => x.Id == consumeContext.Message.EntityId);
-            user.Email = consumeContext.Message.Email;
-            _userContext.Users.Update(user);
-            await _userContext.SaveChangesAsync();
         }
     }
 }

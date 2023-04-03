@@ -1,14 +1,12 @@
-using UserAPI.DataContext;
-using UserAPI.Mapping;
-using UserAPI.Services;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using UserAPI.Domain;
 using AuthorizationApi.Services;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using MassTransit;
+using UserAPI.DataContext;
+using UserAPI.Services;
 
 namespace UserAPI
 {
@@ -33,18 +31,18 @@ namespace UserAPI
             builder.Services.AddSingleton(tokenValidationParameters);
 
 
-            builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<UsersDataContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                            .AddJwtBearer(x =>
-                            {
-                                x.SaveToken = true;
-                                x.TokenValidationParameters = tokenValidationParameters;
-                            });
+            .AddJwtBearer(x =>
+            {
+                x.SaveToken = true;
+                x.TokenValidationParameters = tokenValidationParameters;
+            });
 
             builder.Services.AddMvc();
             builder.Services.AddSwaggerGen(x =>
@@ -63,22 +61,19 @@ namespace UserAPI
                     Type = SecuritySchemeType.ApiKey
                 });
                 x.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {new OpenApiSecurityScheme{Reference = new OpenApiReference
-        {
-            Id = "Bearer",
-            Type = ReferenceType.SecurityScheme
-        }}, new List<string>()}
-    });
+                {
+                    {new OpenApiSecurityScheme{Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }}, new List<string>()}
+                });
             });
             builder.Services.AddControllers();
 
             builder.Services.AddControllers();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
-            
-
 
             var app = builder.Build();
 

@@ -4,6 +4,7 @@ using OrderAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using OrderAPI.Domain;
+using MassTransit;
 
 namespace OrderAPI
 {
@@ -24,7 +25,7 @@ namespace OrderAPI
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

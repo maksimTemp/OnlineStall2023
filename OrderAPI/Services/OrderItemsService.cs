@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MassTransit.Transports;
 using Microsoft.EntityFrameworkCore;
 using OrderAPI.DataContext;
 using OrderAPI.Domain;
@@ -22,25 +23,34 @@ namespace OrderAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid id)
+        public async Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.OrderItems
+                .Where(x => x.Order.Id == id)
+                .ToListAsync();
         }
-        public Task<IEnumerable<OrderItem>> GetByItemIdAsync(Guid id)
+        public async Task<IEnumerable<OrderItem>> GetByItemIdAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<OrderItem> UpdateAsync(OrderItem obj)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<int> DeleteAsync(DeleteOrderItemRequest deleteOrderItemRequest)
-        {
-            throw new NotImplementedException();
+            return await _dbContext.OrderItems
+                .Where(x => x.ProductId == id)
+                .ToListAsync();
         }
 
-        public Task<OrderItem> GetByIdAsync(Guid id)
+        public async Task<OrderItem> UpdateAsync(OrderItem orderItem)
+        {
+            var upd = _dbContext.OrderItems.Update(orderItem);
+            await _dbContext.SaveChangesAsync();
+            return await Task.FromResult(upd.Entity);
+        }
+        public async Task<int> DeleteAsync(DeleteOrderItemRequest deleteOrderItemRequest)
+        {
+            throw new NotImplementedException();
+            //var toDelete = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == id);
+            //_dbContext.Orders.Remove(toDelete);
+            //return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<OrderItem> GetByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }

@@ -75,6 +75,12 @@ namespace UserAPI
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
 
+            builder.Services.AddMassTransit(config => {
+                config.UsingRabbitMq((ctx, cfg) => {
+                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

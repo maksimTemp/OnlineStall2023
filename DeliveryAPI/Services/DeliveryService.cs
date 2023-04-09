@@ -2,6 +2,7 @@
 using DeliveryAPI.DataContext;
 using DeliveryAPI.Domain;
 using DeliveryAPI.Models.Requests;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Enums;
 
@@ -11,11 +12,13 @@ namespace DeliveryAPI.Services
     {
         private DeliveryDataContext _dbContext { get; set; }
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public DeliveryService(DeliveryDataContext context, IMapper mapper)
+        public DeliveryService(DeliveryDataContext context, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _dbContext = context;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<Delivery> ConfirmDelivery(Guid deliveryId)

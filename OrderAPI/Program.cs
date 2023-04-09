@@ -25,7 +25,13 @@ namespace OrderAPI
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            
+
+            builder.Services.AddMassTransit(config => {
+                config.UsingRabbitMq((ctx, cfg) => {
+                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+                });
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

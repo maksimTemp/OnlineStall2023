@@ -3,6 +3,7 @@ using CatalogAPI.Mapping;
 using CatalogAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using MassTransit;
 
 namespace CatalogAPI
 {
@@ -26,6 +27,11 @@ namespace CatalogAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddMassTransit(config => {
+                config.UsingRabbitMq((ctx, cfg) => {
+                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+                });
+            });
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())

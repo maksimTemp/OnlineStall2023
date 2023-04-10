@@ -4,6 +4,8 @@ using CatalogAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using MassTransit;
+using SharedLibrary;
+using CatalogAPI.Consumers;
 
 namespace CatalogAPI
 {
@@ -27,9 +29,18 @@ namespace CatalogAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddMassTransit(config => {
-                config.UsingRabbitMq((ctx, cfg) => {
-                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+            builder.Services.AddMassTransit(config =>
+            {
+                config.AddConsumer<ChangeStockQuantityConsumer>();
+
+                config.UsingRabbitMq((context, configuration) =>
+                {
+                    configuration.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+
+                    configuration.ReceiveEndpoint(QueuesUrls.OrderCompleted, c =>
+                    {
+                        c.ConfigureConsumer<ChangeStockQuantityConsumer>(context);
+                    });
                 });
             });
             var app = builder.Build();

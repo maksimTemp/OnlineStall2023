@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MassTransit.Transports;
 using Microsoft.EntityFrameworkCore;
+using OrderAPI.Consumers;
 using OrderAPI.DataContext;
 using OrderAPI.Domain;
 using OrderAPI.Models.Requests;
@@ -70,11 +71,24 @@ namespace OrderAPI.Services
         {
             throw new NotImplementedException();
         }
+        public async Task ProductDeletedMessageConsume(ProductDeletedMessage message)
+        {
+            List<OrderItem> orderItems = _dbContext.OrderItems.Where(x => x.ProductId == message.EntityId).ToList();
+            foreach (var upd in orderItems)
+            {
+                upd.ProductId = Guid.Empty;
+                upd.Name = "Product deleted";
+            }
+            _dbContext.UpdateRange(orderItems);
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
     public interface IOrderItemService : IService<OrderItem>
     {
         Task<IEnumerable<OrderItem>> GetByItemIdAsync(Guid id);
         Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid id);
         Task ConsumeItemChangedMessage(ItemChangedMessage message);
+        Task ProductDeletedMessageConsume(ProductDeletedMessage message);
     }
 }

@@ -10,6 +10,7 @@ namespace OrderAPI.Models.Requests
         public string CourierName { get; set; }
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; }
+        public bool? IsDelivery { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel;
 using OrderAPI.Domain;
+using SharedLibrary.Enums;
 
 namespace OrderAPI.Domain
 {
@@ -14,6 +15,11 @@ namespace OrderAPI.Domain
 
         [DefaultValue(1)]
         public decimal TotalPrice { get; set; }
+
+        public OrderStatuses Status { get; set; }
+
+        [DefaultValue(false)]
+        public bool IsDelivery { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; }
     }

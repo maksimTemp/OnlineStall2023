@@ -5,6 +5,7 @@ using CatalogAPI.Models.Requests;
 using AutoMapper;
 using MassTransit;
 using SharedLibrary.Messages;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace CatalogAPI.Services
 {
@@ -56,10 +57,22 @@ namespace CatalogAPI.Services
             await _publishEndpoint.Publish(deleteMessage);
             return await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<int> ChangeStockQuantityMessageConsume(ChangeStockQuantityMessage message)
+        {
+            foreach (var item in message.ProductsQuantity)
+            {
+                var prod = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == item.Item1);
+                prod.Quantity -= item.Item2;
+                _dbContext.Products.Update(prod);
+            }
+            return await _dbContext.SaveChangesAsync();
+        }
     }
 
     public interface IProductsService : IService<Product>
     {
+        Task<int> ChangeStockQuantityMessageConsume(ChangeStockQuantityMessage message);
         Task<Product> CreateAsync(ProductCreateRequest product);
     }
 }

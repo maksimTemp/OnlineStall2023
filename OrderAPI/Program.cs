@@ -30,6 +30,8 @@ namespace OrderAPI
             builder.Services.AddMassTransit(config =>
             {
                 config.AddConsumer<ItemChangedConsumer>();
+                config.AddConsumer<ProductDeletedMessageConsumer>();
+                config.AddConsumer<DeliveryStatusChangedConsumer>();
 
                 config.UsingRabbitMq((context, configuration) =>
                 {
@@ -38,6 +40,14 @@ namespace OrderAPI
                     configuration.ReceiveEndpoint(QueuesUrls.CatalogPtoductNameChanged, c =>
                     {
                         c.ConfigureConsumer<ItemChangedConsumer>(context);
+                    });
+                    configuration.ReceiveEndpoint(QueuesUrls.CatalogPtoductDeleted, c =>
+                    {
+                        c.ConfigureConsumer<ProductDeletedMessageConsumer>(context);
+                    });
+                    configuration.ReceiveEndpoint(QueuesUrls.DeliveryStatusChanged, c =>
+                    {
+                        c.ConfigureConsumer<DeliveryStatusChangedConsumer>(context);
                     });
                 });
             });

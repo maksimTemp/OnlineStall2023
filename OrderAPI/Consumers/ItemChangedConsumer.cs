@@ -14,7 +14,7 @@ namespace OrderAPI.Consumers
 
         public async Task Consume(ConsumeContext<ItemChangedMessage> context)
         {
-            await _orderItemService.UpdateItems(context.Message);
+            await _orderItemService.ConsumeItemChangedMessage(context.Message);
         }
     }
 }

@@ -3,6 +3,8 @@ using CatalogAPI.DataContext;
 using CatalogAPI.Domain;
 using CatalogAPI.Models.Requests;
 using AutoMapper;
+using MassTransit;
+using SharedLibrary.Messages;
 
 namespace CatalogAPI.Services
 {
@@ -10,11 +12,13 @@ namespace CatalogAPI.Services
     {
         private readonly CatalogDataContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public ProductsService(CatalogDataContext dbContext, IMapper mapper)
+        public ProductsService(CatalogDataContext dbContext, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<Product> GetByIdAsync(Guid id)
@@ -38,21 +42,18 @@ namespace CatalogAPI.Services
         public async Task<Product> UpdateAsync(Product product)
         {
             var upd = _dbContext.Products.Update(product);
+            var updateMessage = _mapper.Map<ItemChangedMessage>(upd.Entity);
+            await _publishEndpoint.Publish(updateMessage);
             await _dbContext.SaveChangesAsync();
             return await Task.FromResult(upd.Entity);
-        }
-
-        public async Task UpdateRangeAsync(IEnumerable<Product> products)
-        {
-            _dbContext.Products.UpdateRange(products);
-            await _dbContext.SaveChangesAsync();
-            return;
         }
 
         public async Task<int> DeleteAsync(Guid id)
         {
             var toDelete = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
-            _dbContext.Products.Remove(toDelete);
+            var deletedEntity = _dbContext.Products.Remove(toDelete);
+            var deleteMessage = _mapper.Map<ProductDeletedMessage>(deletedEntity.Entity);
+            await _publishEndpoint.Publish(deleteMessage);
             return await _dbContext.SaveChangesAsync();
         }
     }
@@ -60,6 +61,5 @@ namespace CatalogAPI.Services
     public interface IProductsService : IService<Product>
     {
         Task<Product> CreateAsync(ProductCreateRequest product);
-        Task UpdateRangeAsync(IEnumerable<Product> product);
     }
 }

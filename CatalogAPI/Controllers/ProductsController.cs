@@ -41,12 +41,6 @@ namespace CatalogAPI.Controllers
             return await _service.UpdateAsync(req);
         }
 
-        [HttpPut]
-        public async Task UpdateRange([FromBody] IEnumerable<Product> req)
-        {
-            await _service.UpdateRangeAsync(req);
-        }
-
         [HttpDelete("{id}")]
         public async Task<int> Delete(Guid id)
         {

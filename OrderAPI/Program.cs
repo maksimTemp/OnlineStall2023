@@ -1,10 +1,11 @@
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using OrderAPI.Consumers;
 using OrderAPI.DataContext;
 using OrderAPI.Mapping;
 using OrderAPI.Services;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using OrderAPI.Domain;
-using MassTransit;
+using SharedLibrary;
+using System.Configuration;
 
 namespace OrderAPI
 {
@@ -26,9 +27,18 @@ namespace OrderAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddMassTransit(config => {
-                config.UsingRabbitMq((ctx, cfg) => {
-                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+            builder.Services.AddMassTransit(config =>
+            {
+                config.AddConsumer<ItemChangedConsumer>();
+
+                config.UsingRabbitMq((context, configuration) =>
+                {
+                    configuration.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+
+                    configuration.ReceiveEndpoint(QueuesUrls.CatalogPtoductNameChanged, c =>
+                    {
+                        c.ConfigureConsumer<ItemChangedConsumer>(context);
+                    });
                 });
             });
 

@@ -2,6 +2,7 @@
 using CatalogAPI.DataContext;
 using CatalogAPI.Domain;
 using CatalogAPI.Models.Requests;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogAPI.Services

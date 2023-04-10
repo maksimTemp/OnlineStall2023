@@ -5,6 +5,7 @@ using DeliveryAPI.Models.Requests;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Enums;
+using SharedLibrary.Messages;
 
 namespace DeliveryAPI.Services
 {
@@ -58,13 +59,17 @@ namespace DeliveryAPI.Services
         public async Task<int> DeleteAsync(Guid id)
         {
             var toDelete = await _dbContext.Deliveries.FirstOrDefaultAsync(x => x.Id == id);
-            _dbContext.Deliveries.Remove(toDelete);
+            var deletedEntity = _dbContext.Deliveries.Remove(toDelete);
+            var deleteMessage = _mapper.Map<DeliveryDeletedMessage>(deletedEntity.Entity);
+            await _publishEndpoint.Publish(deleteMessage);
             return await _dbContext.SaveChangesAsync();
         }
 
         public async  Task<Delivery> UpdateAsync(Delivery delivery)
         {
             var upd = _dbContext.Deliveries.Update(delivery);
+            var updateMessage = _mapper.Map<DeliveryDataChangedMessage>(upd.Entity);
+            await _publishEndpoint.Publish(updateMessage);
             await _dbContext.SaveChangesAsync();
             return await Task.FromResult(upd.Entity);
         }

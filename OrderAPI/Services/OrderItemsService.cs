@@ -45,7 +45,7 @@ namespace OrderAPI.Services
         public async Task<int> DeleteAsync(DeleteOrderItemRequest deleteOrderItemRequest)
         {
             throw new NotImplementedException();
-            //var toDelete = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == id);
+            //var toDelete = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == deleteOrderItemRequest.Ent);
             //_dbContext.Orders.Remove(toDelete);
             //return await _dbContext.SaveChangesAsync();
         }
@@ -55,12 +55,18 @@ namespace OrderAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<int> DeleteAsync(Guid id)
+        public async Task ConsumeItemChangedMessage(ItemChangedMessage message)
         {
-            throw new NotImplementedException();
+            List<OrderItem> orderItems = _dbContext.OrderItems.Where(x => x.ProductId == message.EntityId).ToList();
+            foreach(var upd in orderItems)
+            {
+                upd.Name = message.Name;
+            }
+            _dbContext.UpdateRange(orderItems);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateItems(ItemChangedMessage message)
+        public Task<int> DeleteAsync(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -69,6 +75,6 @@ namespace OrderAPI.Services
     {
         Task<IEnumerable<OrderItem>> GetByItemIdAsync(Guid id);
         Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid id);
-        Task UpdateItems(ItemChangedMessage message);
+        Task ConsumeItemChangedMessage(ItemChangedMessage message);
     }
 }

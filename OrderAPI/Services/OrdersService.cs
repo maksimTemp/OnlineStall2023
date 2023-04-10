@@ -3,6 +3,8 @@ using OrderAPI.DataContext;
 using OrderAPI.Domain;
 using OrderAPI.Models.Requests;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrary.Messages;
+using MassTransit;
 
 namespace OrderAPI.Services
 {
@@ -10,11 +12,13 @@ namespace OrderAPI.Services
     {
         private readonly OrdersDataContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrdersService(OrdersDataContext dbContext, IMapper mapper)
+        public OrdersService(OrdersDataContext dbContext, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<Order> GetByIdAsync(Guid id)
@@ -38,6 +42,8 @@ namespace OrderAPI.Services
         public async Task<Order> UpdateAsync(Order order)
         {
             var upd = _dbContext.Orders.Update(order);
+            var updateMessage = _mapper.Map<OrderDataChangedMessage>(upd.Entity);
+            await _publishEndpoint.Publish(updateMessage);
             await _dbContext.SaveChangesAsync();
             return await Task.FromResult(upd.Entity);
         }

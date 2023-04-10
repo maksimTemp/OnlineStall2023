@@ -1,6 +1,6 @@
 ﻿namespace SharedLibrary.Messages
 {
-    public class ItemChangedMessage : MessageBase
+    public class ProductDataChangedMessage : MessageBase
     {
         public string Name { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using DeliveryAPI.Domain;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrary.Messages;
 
 namespace DeliveryAPI.DataContext
 {
@@ -12,10 +13,21 @@ namespace DeliveryAPI.DataContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Delivery>()
-                .HasMany(x => x.Items);
+                .HasMany(o => o.Items)
+            .WithOne(oi => oi.Delivery);
+
+            modelBuilder.Entity<DeliveryItem>()
+                .HasOne(x => x.Delivery)
+                .WithMany(o => o.Items)
+                .HasForeignKey(x => x.DeliveryId);
+
+            modelBuilder.Entity<DeliveryItem>()
+                .HasKey(oi => new { oi.DeliveryId, oi.ProductId });
+
+            
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

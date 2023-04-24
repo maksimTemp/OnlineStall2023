@@ -12,6 +12,6 @@ namespace DeliveryAPI.Models.Requests
         public string CustomerName { get; set; }
         public string? Adress { get; set; }
         public decimal TotalPrice { get; set; }
-        public IEnumerable<DeliveryItem> Items { get; set; }
+        public ICollection<DeliveryItem> Items { get; set; }
     }
 }

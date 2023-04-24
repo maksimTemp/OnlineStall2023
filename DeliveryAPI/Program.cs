@@ -5,6 +5,10 @@ using AutoMapper;
 using MassTransit;
 using SharedLibrary;
 using DeliveryAPI.Consumers;
+using DeliveryAPI.Mapping;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace DeliveryAPI
 {
@@ -21,7 +25,15 @@ namespace DeliveryAPI
             builder.Services.AddTransient<IDeliveryService, DeliveryService>();
             builder.Services.AddTransient<IDeliveryItemService, DeliveryItemsService>();
             
-            builder.Services.AddControllers();
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddControllers(options =>
+            {
+                options.OutputFormatters.RemoveType<SystemTextJsonOutputFormatter>();
+                options.OutputFormatters.Add(new SystemTextJsonOutputFormatter(new JsonSerializerOptions(JsonSerializerDefaults.Web)
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                }));
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -30,6 +42,7 @@ namespace DeliveryAPI
             {
                 config.AddConsumer<ItemChangedConsumer>();
                 config.AddConsumer<ProductDeletedMessageConsumer>();
+                config.AddConsumer<DeliveryCreateMessageConsumer>();
 
                 config.UsingRabbitMq((context, configuration) =>
                 {
@@ -42,6 +55,10 @@ namespace DeliveryAPI
                     configuration.ReceiveEndpoint(QueuesUrls.CatalogProductDeleted, c =>
                     {
                         c.ConfigureConsumer<ProductDeletedMessageConsumer>(context);
+                    });
+                    configuration.ReceiveEndpoint(QueuesUrls.DeliveryCreated, c =>
+                    {
+                        c.ConfigureConsumer<DeliveryCreateMessageConsumer>(context);
                     });
                 });
             });

@@ -73,6 +73,22 @@ namespace DeliveryAPI.Services
             await _dbContext.SaveChangesAsync();
             return await Task.FromResult(upd.Entity);
         }
+
+        public async Task ConsumeDeliveryCreateMessage(DeliveryCreateMessage message)
+        {
+            var delivery = _mapper.Map<Delivery>(message);
+            var tmpList = new List<DeliveryItem>();
+            foreach(var item in message.Items)
+            {
+                var tmpItem = _mapper.Map<DeliveryItem>(item);
+                tmpItem.Delivery = delivery;
+                tmpList.Add(tmpItem);
+            }
+            delivery.Items = tmpList;
+            delivery.Status = DeliveryStatuses.Pending;
+            await _dbContext.Deliveries.AddAsync(delivery);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
     public interface IDeliveryService
@@ -84,5 +100,6 @@ namespace DeliveryAPI.Services
         Task<Delivery> CreateAsync(CreateDeliveryRequest req);
         Task<int> DeleteAsync(Guid id);
         Task<Delivery> UpdateAsync(Delivery req);
+        Task ConsumeDeliveryCreateMessage(DeliveryCreateMessage message);
     }
 }

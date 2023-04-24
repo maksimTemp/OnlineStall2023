@@ -1,16 +1,23 @@
 ﻿using OrderAPI.Domain;
+using SharedLibrary.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel;
+using SharedLibrary.Enums;
 
 namespace OrderAPI.Models.Requests
 {
     public class CreateOrderRequest
     {
-        public string? Adress { get; set; }
-        public decimal Price { get; set; }
-        public Guid CourierId { get; set; }
-        public string CourierName { get; set; }
-        public Guid CustomerId { get; set; }
-        public string CustomerName { get; set; }
-        public bool? IsDelivery { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public decimal? TotalPrice => OrderItems.Sum(oi => oi.TotalPrice);
+        
+        [DefaultValue(OrderStatuses.InProcess)]
+        public OrderStatuses Status { get; set; }
+
+        [DefaultValue(false)]
+        public bool IsDelivery { get; set; }
+
         public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

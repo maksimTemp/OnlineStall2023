@@ -63,8 +63,8 @@ namespace CatalogAPI.Services
         {
             foreach (var item in message.ProductsQuantity)
             {
-                var prod = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == item.Item1);
-                prod.Quantity -= item.Item2;
+                var prod = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == item.Id);
+                prod.Quantity -= item.Quantity;
                 _dbContext.Products.Update(prod);
             }
             return await _dbContext.SaveChangesAsync();

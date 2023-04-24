@@ -37,40 +37,30 @@ namespace OrderAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            //builder.Services.AddMassTransit(config =>
-            //{
-            //    config.AddConsumer<ItemChangedConsumer>();
-            //    config.AddConsumer<ProductDeletedMessageConsumer>();
-            //    config.AddConsumer<DeliveryStatusChangedConsumer>();
+            builder.Services.AddMassTransit(config =>
+            {
+                config.AddConsumer<ItemChangedConsumer>();
+                config.AddConsumer<ProductDeletedMessageConsumer>();
+                config.AddConsumer<DeliveryStatusChangedConsumer>();
 
-            //    config.UsingRabbitMq((context, configuration) =>
-            //    {
-            //        configuration.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+                config.UsingRabbitMq((context, configuration) =>
+                {
+                    configuration.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
 
-            //        configuration.ReceiveEndpoint(QueuesUrls.CatalogProductNameChanged, c =>
-            //        {
-            //            c.ConfigureConsumer<ItemChangedConsumer>(context);
-            //        });
-            //        configuration.ReceiveEndpoint(QueuesUrls.CatalogProductDeleted, c =>
-            //        {
-            //            c.ConfigureConsumer<ProductDeletedMessageConsumer>(context);
-            //        });
-            //        configuration.ReceiveEndpoint(QueuesUrls.DeliveryStatusChanged, c =>
-            //        {
-            //            c.ConfigureConsumer<DeliveryStatusChangedConsumer>(context);
-            //        });
-            //    });
-            //});
-            var rabbitMqSettings = builder.Configuration.GetSection(nameof(RabbitMqSettings)).Get<RabbitMqSettings>();
-            builder.Services.AddMassTransit(mt => mt.UsingRabbitMq((cntxt, cfg) => {
-                cfg.Host(rabbitMqSettings.Uri, "/", c => {
-                    c.Username(rabbitMqSettings.UserName);
-                    c.Password(rabbitMqSettings.Password);
+                    configuration.ReceiveEndpoint(QueuesUrls.CatalogProductNameChanged, c =>
+                    {
+                        c.ConfigureConsumer<ItemChangedConsumer>(context);
+                    });
+                    configuration.ReceiveEndpoint(QueuesUrls.CatalogProductDeleted, c =>
+                    {
+                        c.ConfigureConsumer<ProductDeletedMessageConsumer>(context);
+                    });
+                    configuration.ReceiveEndpoint(QueuesUrls.DeliveryStatusChanged, c =>
+                    {
+                        c.ConfigureConsumer<DeliveryStatusChangedConsumer>(context);
+                    });
                 });
-                cfg.ReceiveEndpoint("samplequeue", (c) => {
-                    c.Consumer<CommandMessageConsumer>();
-                });
-            }));
+            });
 
             var app = builder.Build();
 

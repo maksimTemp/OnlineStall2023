@@ -5,6 +5,7 @@ namespace DeliveryAPI.Domain
     public class DeliveryItem
     {
         public Delivery Delivery { get; set; }
+        public Guid? DeliveryId { get; set; }
         public Guid ProductId { get; set; }
         public string Name { get; set; }
 

@@ -14,5 +14,6 @@ namespace SharedLibrary
         public static string DeliveryStatusChanged = "DeliveryStatusChanged";
 
         public static string OrderCompleted = "OrderCompleted";
+        public static string DeliveryCreated = "DeliveryCreated";
     }
 }

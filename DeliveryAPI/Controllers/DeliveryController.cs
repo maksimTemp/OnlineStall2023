@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class DeliveryController : ControllerBase
     {

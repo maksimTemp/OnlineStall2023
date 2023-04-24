@@ -10,11 +10,10 @@ namespace OrderAPI.Domain
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
-        [DefaultValue(1)]
-        public decimal TotalPrice { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public decimal? TotalPrice => OrderItems.Sum(oi => oi.TotalPrice);
 
         public OrderStatuses Status { get; set; }
 

@@ -4,7 +4,8 @@ namespace OrderAPI.Domain
 {
     public class OrderItem
     {
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
+        public Guid? OrderId { get; set; }
         public Guid ProductId { get; set; }
         public string Name { get; set; }
 

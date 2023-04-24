@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CatalogAPI.DataContext;
-using System.Data.Entity;
 using CatalogAPI.Domain;
 using AutoMapper;
 using CatalogAPI.Models.Requests;

@@ -2,10 +2,12 @@
 using OrderAPI.Domain;
 using OrderAPI.Models.Requests;
 using OrderAPI.Services;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OrderAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class OrdersController : ControllerBase
     {

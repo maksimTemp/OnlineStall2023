@@ -12,10 +12,26 @@ namespace OrderAPI.DataContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            //modelBuilder.Entity<Order>()
+            //    .HasMany(o => o.OrderItems)
+            //    .WithOne(oi => oi.Order)
+            //    .HasForeignKey(oi => oi.OrderId);
+
+
+            //modelBuilder.Entity<OrderItem>()
+            //    .HasOne(oi => oi.Order)
+            //    .WithMany(o => o.OrderItems)
+            //    .HasForeignKey(oi => oi.OrderId);
 
             modelBuilder.Entity<Order>()
-                .HasMany(x => x.OrderItems);
+                .HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order);
+
+            modelBuilder.Entity<OrderItem>()
+                .HasKey(oi => new { oi.OrderId, oi.ProductId });
+
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

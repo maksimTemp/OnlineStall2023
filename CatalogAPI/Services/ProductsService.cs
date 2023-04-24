@@ -44,9 +44,10 @@ namespace CatalogAPI.Services
         {
             var upd = _dbContext.Products.Update(product);
             var updateMessage = _mapper.Map<ItemChangedMessage>(upd.Entity);
+            updateMessage.OperationType = SharedLibrary.Enums.OperationTypeMessage.Update;
             await _publishEndpoint.Publish(updateMessage);
             await _dbContext.SaveChangesAsync();
-            return await Task.FromResult(upd.Entity);
+            return upd.Entity;
         }
 
         public async Task<int> DeleteAsync(Guid id)

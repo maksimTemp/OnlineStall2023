@@ -1,20 +1,20 @@
-﻿//using MassTransit;
-//using OrderAPI.Services;
-//using SharedLibrary.Messages;
+﻿using MassTransit;
+using DeliveryAPI.Services;
+using SharedLibrary.Messages;
 
-//namespace OrderAPI.Consumers
-//{
-//    public class ProductDeletedMessageConsumer : IConsumer<ProductDeletedMessage>
-//    {
-//        private IOrderItemService _orderItemService;
-//        public ProductDeletedMessageConsumer(IOrderItemService orderService)
-//        {
-//            this._orderItemService = orderService;
-//        }
+namespace DeliveryAPI.Consumers
+{
+    public class ProductDeletedMessageConsumer : IConsumer<ProductDeletedMessage>
+    {
+        private IDeliveryItemService _deliveryItemService;
+        public ProductDeletedMessageConsumer(IDeliveryItemService deliveryService)
+        {
+            this._deliveryItemService = deliveryService;
+        }
 
-//        public async Task Consume(ConsumeContext<ProductDeletedMessage> context)
-//        {
-//            await _orderItemService.ProductDeletedMessageConsume(context.Message);
-//        }
-//    }
-//}
+        public async Task Consume(ConsumeContext<ProductDeletedMessage> context)
+        {
+            await _deliveryItemService.ProductDeletedMessageConsume(context.Message);
+        }
+    }
+}

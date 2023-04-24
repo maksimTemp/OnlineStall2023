@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MassTransit;
 using MassTransit.Transports;
 using Microsoft.EntityFrameworkCore;
 using OrderAPI.Consumers;
@@ -13,10 +14,12 @@ namespace OrderAPI.Services
     {
         private readonly OrdersDataContext _dbContext;
         private readonly IMapper _mapper;
-        public OrderItemsService(OrdersDataContext dbContext, IMapper mapper)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public OrderItemsService(OrdersDataContext dbContext, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<IEnumerable<OrderItem>> GetAll()
@@ -45,10 +48,11 @@ namespace OrderAPI.Services
         }
         public async Task<int> DeleteAsync(DeleteOrderItemRequest deleteOrderItemRequest)
         {
-            throw new NotImplementedException();
-            //var toDelete = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == deleteOrderItemRequest.Ent);
-            //_dbContext.Orders.Remove(toDelete);
-            //return await _dbContext.SaveChangesAsync();
+            var toDelete = await _dbContext.OrderItems.FirstOrDefaultAsync(x => x.Order.Id == deleteOrderItemRequest.OrderId && x.ProductId == deleteOrderItemRequest.OrderItemId);
+            var deletedEntity = _dbContext.OrderItems.Remove(toDelete);
+            var deleteMessage = _mapper.Map<OrderItemDeletedMessage>(deletedEntity.Entity);
+            await _publishEndpoint.Publish(deleteMessage);
+            return await _dbContext.SaveChangesAsync();
         }
 
         public async Task<OrderItem> GetByIdAsync(Guid id)
@@ -63,7 +67,7 @@ namespace OrderAPI.Services
             {
                 upd.Name = message.Name;
             }
-            _dbContext.UpdateRange(orderItems);
+            _dbContext.OrderItems.UpdateRange(orderItems);
             await _dbContext.SaveChangesAsync();
         }
 

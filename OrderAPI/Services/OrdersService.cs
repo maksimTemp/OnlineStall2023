@@ -31,12 +31,15 @@ namespace OrderAPI.Services
 
         public async Task<IEnumerable<Order>> GetAll()
         {
-            return await _dbContext.Orders.ToListAsync();
+            return await _dbContext.Orders
+                .Include(x => x.OrderItems)
+                .ToListAsync();
         }
 
         public async Task<Order> CreateAsync(CreateOrderRequest order)
         {
             var toCreate = _mapper.Map<Order>(order);
+
             var res = await _dbContext.Orders.AddAsync(toCreate);
             await _dbContext.SaveChangesAsync();
             return res.Entity;
